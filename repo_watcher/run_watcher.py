@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 
 
 @click.group()
-def cli():
+def cli() -> None:
     """CLI interface to run a RepoWatcher"""
     pass
 
@@ -26,7 +26,9 @@ def cli():
     "--log_level", type=click.Choice(["WARNING", "INFO", "DEBUG"]), default="INFO"
 )
 @click.option("--interval", help="Update interval in minutes", default=30, type=int)
-def tag(repo, pattern, log_level, interval, single_run=False):
+def tag(
+    repo: str, pattern: str, log_level: str, interval: int, single_run: bool = False
+) -> None:
     """
     Run a TagRepoWatcher on a passed local repository.
     """

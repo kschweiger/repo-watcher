@@ -29,7 +29,7 @@ class RepoWatcher(ABC):
         self.branch: Optional[str] = None
         self.commit: Optional[str] = None
 
-    def initialize_git(self):
+    def initialize_git(self) -> None:
         if self.repo is not None:
             raise RepoAlreadyInitializedException("Repo already initialized")
 
@@ -56,7 +56,10 @@ class RepoWatcher(ABC):
 
         return refs
 
-    def _fetch_remote(self):
+    def _fetch_remote(self) -> None:
+        if self.repo is None:
+            raise RepoNotInitializedException("Repo not initialized")
+
         logger.info(
             "Fetching repo %s from remote %s", self.repo_path, self.repo.remote().name
         )
@@ -72,7 +75,7 @@ class RepoWatcher(ABC):
         """
 
     @abstractmethod
-    def update_head(self):
+    def update_head(self) -> None:
         """
         Main method handling the updating of the current repository
         """
@@ -127,7 +130,7 @@ class TagRepoWatcher(RepoWatcher):
         self.newest_tag: Optional[str] = None
         self.newest_tag_sha: Optional[str] = None
 
-    def update_pattern(self, tag_pattern):
+    def update_pattern(self, tag_pattern: str) -> None:
         self.pattern = tag_pattern
         self.pattern_okay, self.pattern_type = self._validated_pattern(tag_pattern)
 
@@ -163,7 +166,7 @@ class TagRepoWatcher(RepoWatcher):
 
         for ref in refs:
             if ref.name == tag:
-                return ref.commit.hexsha
+                return str(ref.commit.hexsha)
 
         raise InvalidTagException("Not reference for tag %s found" % tag)
 
@@ -195,7 +198,7 @@ class TagRepoWatcher(RepoWatcher):
             logger.info("Head is on latest tag")
             return False
 
-    def update_head(self):
+    def update_head(self) -> None:
         if self.repo is None:
             raise RepoNotInitializedException("Repo not initialized")
 
@@ -208,7 +211,7 @@ class TagRepoWatcher(RepoWatcher):
         self.repo.git.checkout(self.newest_tag_sha)
 
     @staticmethod
-    def _validated_pattern(pattern) -> Tuple[bool, PatternType]:
+    def _validated_pattern(pattern: str) -> Tuple[bool, PatternType]:
         valid_pattern_a = re.compile("[0-9]*\.\*\Z")  # noqa: W605
         valid_pattern_b = re.compile("[0-9]*\.[0-9]*\.\*\Z")  # noqa: W605
 

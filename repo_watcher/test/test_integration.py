@@ -9,7 +9,7 @@ from repo_watcher.run_watcher import tag
 
 
 @pytest.fixture
-def repo_for_testing():
+def repo_for_testing() -> Repo:
     repo_path = os.path.join(os.getcwd(), "integration-test-repo")
     repo = Repo.init(repo_path)
 
