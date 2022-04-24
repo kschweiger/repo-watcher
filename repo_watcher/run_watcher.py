@@ -26,7 +26,7 @@ def cli():
     "--log_level", type=click.Choice(["WARNING", "INFO", "DEBUG"]), default="INFO"
 )
 @click.option("--interval", help="Update interval in minutes", default=30, type=int)
-def tag(repo, pattern, log_level, interval):
+def tag(repo, pattern, log_level, interval, single_run=False):
     """
     Run a TagRepoWatcher on a passed local repository.
     """
@@ -39,11 +39,14 @@ def tag(repo, pattern, log_level, interval):
 
     watcher = TagRepoWatcher(repo, pattern)
     watcher.initialize_git()
-    while True:
+    exit_condition = True
+    while exit_condition:
         if watcher.observe():
             watcher.update_head()
         logger.debug("Sleeping for %s minutes", interval)
         sleep(interval * 60)
+        if single_run:
+            exit_condition = False
 
 
 if __name__ == "__main__":

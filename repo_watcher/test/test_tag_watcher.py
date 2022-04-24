@@ -1,9 +1,16 @@
 from copy import copy
 from unittest.mock import MagicMock
 
+import git
 import pytest
 
 from repo_watcher.enums import PatternType
+from repo_watcher.exceptions import (
+    InvalidTagException,
+    NoTagsFoundException,
+    RepoAlreadyInitializedException,
+    RepoNotInitializedException,
+)
 from repo_watcher.repo_watcher import TagRepoWatcher
 
 
@@ -60,3 +67,80 @@ def test_get_newest_tag(pattern, sorted_tags, exp_tag):
     latest_tag = watcher.get_newest_tag()
 
     assert latest_tag == exp_tag
+
+
+def test_get_sha_for_tag():
+    watcher = TagRepoWatcher("/path/to/repo", "*")
+
+    watcher.repo = MagicMock()
+
+    tag_ref = MagicMock(spec=git.TagReference)
+    tag_ref.name = "1.0.0"
+    tag_ref.commit.hexsha = "xyz"
+
+    watcher.repo.references = [tag_ref]
+
+    assert watcher.get_sha_for_tag("1.0.0") == "xyz"
+
+
+def test_get_sha_for_tag_invalid_tag_exception_no_refs():
+    watcher = TagRepoWatcher("/path/to/repo", "*")
+
+    watcher.repo = MagicMock()
+
+    watcher.repo.references = []
+
+    with pytest.raises(InvalidTagException):
+        watcher.get_sha_for_tag("1.0.0")
+
+
+def test_get_sha_for_tag_invalid_tag_exception_no_fitting_ref():
+    watcher = TagRepoWatcher("/path/to/repo", "*")
+
+    watcher.repo = MagicMock()
+
+    tag_ref = MagicMock(spec=git.TagReference)
+    tag_ref.name = "1.0.0"
+    tag_ref.commit.hexsha = "xyz"
+
+    watcher.repo.references = [tag_ref]
+
+    with pytest.raises(InvalidTagException):
+        watcher.get_sha_for_tag("1.1.0")
+
+
+def test_get_newest_tag_no_tag_exception():
+    watcher = TagRepoWatcher("/path/to/repo", "*")
+    sorted_tags_mock = MagicMock()
+    sorted_tags_mock.return_value = []
+    watcher.get_sorted_tags = sorted_tags_mock
+
+    with pytest.raises(NoTagsFoundException):
+        watcher.get_newest_tag()
+
+
+def test_repo_not_initialized_exception():
+    watcher = TagRepoWatcher("/path/to/repo", "*")
+
+    with pytest.raises(RepoNotInitializedException):
+        watcher.get_reference_for_commit("commit_sha")
+
+    with pytest.raises(RepoNotInitializedException):
+        watcher.get_sorted_tags()
+
+    with pytest.raises(RepoNotInitializedException):
+        watcher.get_sha_for_tag("1.0.0")
+
+    with pytest.raises(RepoNotInitializedException):
+        watcher.observe()
+
+    with pytest.raises(RepoNotInitializedException):
+        watcher.update_head()
+
+
+def test_initialize_repo_exception():
+    watcher = TagRepoWatcher("/path/to/repo", "*")
+    watcher.repo = MagicMock()
+
+    with pytest.raises(RepoAlreadyInitializedException):
+        watcher.initialize_git()

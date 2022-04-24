@@ -8,3 +8,11 @@ class NoTagsFoundException(RepoWatcherException):
 
 class InvalidTagException(RepoWatcherException):
     pass
+
+
+class RepoNotInitializedException(RepoWatcherException):
+    pass
+
+
+class RepoAlreadyInitializedException(RepoWatcherException):
+    pass

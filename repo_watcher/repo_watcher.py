@@ -10,6 +10,8 @@ from repo_watcher.enums import PatternType
 from repo_watcher.exceptions import (
     InvalidTagException,
     NoTagsFoundException,
+    RepoAlreadyInitializedException,
+    RepoNotInitializedException,
     RepoWatcherException,
 )
 
@@ -29,7 +31,8 @@ class RepoWatcher(ABC):
 
     def initialize_git(self):
         if self.repo is not None:
-            raise RuntimeError("Repo already initialized")
+            raise RepoAlreadyInitializedException("Repo already initialized")
+
         self.repo = Repo(self.repo_path)
         self.repo_initialized = datetime.now()
 
@@ -44,7 +47,7 @@ class RepoWatcher(ABC):
 
     def get_reference_for_commit(self, commit_sha: str) -> List[Reference]:
         if self.repo is None:
-            raise RuntimeError("Repo not initialized")
+            raise RepoNotInitializedException("Repo not initialized")
 
         refs = []
         for ref in self.repo.references:
@@ -143,17 +146,18 @@ class TagRepoWatcher(RepoWatcher):
             )
             return [tag for tag in tags if r.match(tag) is not None][-1]
         else:
+            # Should not really happen but we still add and exception
             raise RepoWatcherException("Invalid Pattern type")
 
     def get_sorted_tags(self) -> List[str]:
         if self.repo is None:
-            raise RuntimeError("Repo not initialized")
+            raise RepoNotInitializedException("Repo not initialized")
 
         return sorted([ref.name for ref in self.repo.tags])
 
     def get_sha_for_tag(self, tag: str) -> str:
         if self.repo is None:
-            raise RuntimeError("Repo not initialized")
+            raise RepoNotInitializedException("Repo not initialized")
 
         refs = [ref for ref in self.repo.references if isinstance(ref, TagReference)]
 
@@ -165,7 +169,7 @@ class TagRepoWatcher(RepoWatcher):
 
     def observe(self) -> bool:
         if self.repo is None:
-            raise RuntimeError("Repo not initialized")
+            raise RepoNotInitializedException("Repo not initialized")
 
         if self.checked_out_tag is None:
             logger.debug("Checkout out tag not set")
@@ -185,10 +189,16 @@ class TagRepoWatcher(RepoWatcher):
             logger.info("Head is not a latest tag")
             return True
         else:
+            if not self.repo.head.is_detached:
+                logger.info("Repository head is not detaced")
+                return True
             logger.info("Head is on latest tag")
             return False
 
     def update_head(self):
+        if self.repo is None:
+            raise RepoNotInitializedException("Repo not initialized")
+
         logger.info(
             "Updating local repository to tag %s at %s",
             self.newest_tag,
