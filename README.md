@@ -33,3 +33,42 @@ Options:
   --interval INTEGER              Update interval in minutes
   --help                          Show this message and exit.
 ```
+
+
+## Run Repo-Watcher in a Docker container
+
+### Initial thing to consider
+
+- The repo that should be watched is assumed to be outside the docker container. So the directory with the repository to watch has to be mounted.
+- If you clone the repo via ssh (which you probably do and should), the easiest way to still pull (which is an essential function of the watcher) is to forward your ssh-agent to the container (see Docs: ![MacOS](https://docs.docker.com/desktop/mac/networking/#ssh-agent-forwarding))
+  - On MacOS you should add your key to the agent in `.zprofile` first. For some reason (probably login shell related) the ssh-agent sharing is not working when starting DockerDesktop as usual from the Dock/Spotlight/Finder. Instead you have to start it from a terminal with added and running agent with `/Applications/Docker.app/Contents/MacOS/Docker &`
+
+### Setup
+
+1. Clone this repository
+2. Build the image with provided docker file
+    ```zsh
+    docker build -t repo-watcher-daemon .
+    ```
+3. Find the (absolute) path to the repository that should be watched and updated
+
+
+Run the image:
+
+### Running the watcher as daemon
+
+#### On MacOS:
+```zsh
+docker run -d \
+  --mount type=bind,source=/Users/korbinian/Code/test_repo_to_update,target=/repo \
+  --mount type=bind,src=/run/host-services/ssh-auth.sock,target=/run/host-services/ssh-auth.sock \
+  -e SSH_AUTH_SOCK="/run/host-services/ssh-auth.sock"  \
+  -e GIT_SSH_COMMAND="ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no" \
+  --memory="100mb" \
+  --name repo-watcher-daemon repo-watcher-daemon
+```
+
+##### Explanation
+- First `--mount`: Mount the repo that should be watched in the container
+- Second `--mount` and first environment variable (`-e`): Proved the ssh-agent of the host to the container
+- Second environment variable: Git should not to the host authentication when fetching the remote
