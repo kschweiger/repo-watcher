@@ -3,7 +3,7 @@ from time import sleep
 
 import click
 
-from repo_watcher.repo_watcher import TagRepoWatcher
+from repo_watcher.watcher import TagRepoWatcher
 
 logging.getLogger("git").setLevel(logging.WARNING)
 
