@@ -11,7 +11,7 @@ from repo_watcher.exceptions import (
     RepoAlreadyInitializedException,
     RepoNotInitializedException,
 )
-from repo_watcher.repo_watcher import TagRepoWatcher
+from repo_watcher.watcher import TagRepoWatcher
 
 
 @pytest.mark.parametrize(

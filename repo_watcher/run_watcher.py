@@ -1,9 +1,10 @@
 import logging
+import os
 from time import sleep
 
 import click
 
-from repo_watcher.repo_watcher import TagRepoWatcher
+from repo_watcher.watcher import TagRepoWatcher
 
 logging.getLogger("git").setLevel(logging.WARNING)
 
@@ -23,9 +24,18 @@ def cli() -> None:
     help="Tag pattern for the watcher. Supported are '*', 'X.*', and 'X.Y.*'",
 )
 @click.option(
-    "--log_level", type=click.Choice(["WARNING", "INFO", "DEBUG"]), default="INFO"
+    "--log_level",
+    type=click.Choice(["WARNING", "INFO", "DEBUG"]),
+    default="INFO",
+    envvar="WATCHER_LOGLEVEL",
 )
-@click.option("--interval", help="Update interval in minutes", default=30, type=int)
+@click.option(
+    "--interval",
+    help="Update interval in minutes",
+    default=30,
+    type=int,
+    envvar="WATCHER_INTERVAL",
+)
 def tag(
     repo: str, pattern: str, log_level: str, interval: int, single_run: bool = False
 ) -> None:
@@ -36,6 +46,11 @@ def tag(
         format="[%(asctime)s] %(name)-40s %(levelname)-8s %(message)s",
         level=log_level,
     )
+
+    if os.getenv("WATCHER_INTERVAL") is not None:
+        logger.info("Interval read from ENV")
+    if os.getenv("WATCHER_LOGLEVEL") is not None:
+        logger.info("Logging level read from ENV")
 
     logger.info("Starting a TagRepoWatcher for %s" % repo)
 

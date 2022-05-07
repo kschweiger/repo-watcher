@@ -4,7 +4,7 @@ import shutil
 import pytest
 from git import Repo
 
-import repo_watcher.repo_watcher
+import repo_watcher.watcher
 from repo_watcher.run_watcher import tag
 
 
@@ -29,7 +29,7 @@ def repo_for_testing() -> Repo:
 
 def test_run_tag_watcher(monkeypatch, repo_for_testing):
     monkeypatch.setattr(
-        repo_watcher.repo_watcher.TagRepoWatcher, "_fetch_remote", lambda x: None
+        repo_watcher.watcher.TagRepoWatcher, "_fetch_remote", lambda x: None
     )
     # We start with a master branch, one commit and a 1.0.0 tag
 
