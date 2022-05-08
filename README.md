@@ -86,9 +86,22 @@ docker run -d \
   --name repo-watcher-daemon repo-watcher-daemon
 ```
 
+
 #### Explanation
 
 - First `--mount`: Mount the repo that should be watched in the container
 - Second `--mount` and first environment variable (`-e`): Proved the ssh-agent of the host to the container
 - Second environment variable: Git should not to the host authentication when fetching the remote
 - The memory is constrained to 100mb (preliminary setting). In principle the watcher should not use much memory but the GitPython package is known to leak memory
+
+#### Additional info
+
+Interval and log level inside the container can be set via env variables. Add:
+
+```zsh
+-e WATCHER_LOGLEVEL="DEBUG" # OR ERROR/WARNING/INFO
+```
+
+```zsh
+-e WATCHER_LOGLEVEL=10 # 10 minute interval instead of 30 min
+```

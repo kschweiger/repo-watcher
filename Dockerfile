@@ -14,4 +14,4 @@ COPY . .
 
 RUN pip install -e .
 
-CMD [ "run-watcher", "tag", "--repo",  "/repo", "--pattern",  "*", "--log_level", "DEBUG"]
+CMD [ "run-watcher", "tag", "--repo",  "/repo", "--pattern",  "*"]
