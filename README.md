@@ -103,5 +103,5 @@ Interval and log level inside the container can be set via env variables. Add:
 ```
 
 ```zsh
--e WATCHER_LOGLEVEL=10 # 10 minute interval instead of 30 min
+-e WATCHER_INTERVAL=10 # 10 minute interval instead of 30 min
 ```
