@@ -3,6 +3,19 @@
 
 
 
+## <small>1.1.1 (2022-05-08)</small>
+
+* Bump version: 1.1.0 → 1.1.1 ([fe22210](https://github.com/kschweiger/repo-watcher/commit/fe22210))
+* refactor: Changed arguments passed to CMD in Dockerfile ([3b7c117](https://github.com/kschweiger/repo-watcher/commit/3b7c117))
+* doc: Updated CHANGELOG.md ([e5062da](https://github.com/kschweiger/repo-watcher/commit/e5062da))
+
+
+
+##  (2022-05-08)
+
+
+
+
 ## 1.1.0 (2022-05-08)
 
 * Bump version: 1.0.0 → 1.1.0 ([06392ff](https://github.com/kschweiger/repo-watcher/commit/06392ff))
