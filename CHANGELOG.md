@@ -1,3 +1,19 @@
+##  (2022-05-08)
+
+
+
+
+## 1.1.0 (2022-05-08)
+
+* Bump version: 1.0.0 → 1.1.0 ([06392ff](https://github.com/kschweiger/repo-watcher/commit/06392ff))
+* build: Added configs and scripts for releasing ([9a0c323](https://github.com/kschweiger/repo-watcher/commit/9a0c323))
+* fix: Fixed test with renamed file ([3d6380e](https://github.com/kschweiger/repo-watcher/commit/3d6380e))
+* feat(run_watcher): Interval and logging can be set via env variable (#2) ([81da8f0](https://github.com/kschweiger/repo-watcher/commit/81da8f0)), closes [#2](https://github.com/kschweiger/repo-watcher/issues/2)
+* refactor: Renamed file with main class ([f591cf1](https://github.com/kschweiger/repo-watcher/commit/f591cf1))
+* doc: Added changelog ([f9fd7c4](https://github.com/kschweiger/repo-watcher/commit/f9fd7c4))
+
+
+
 ##  (2022-05-01)
 
 
